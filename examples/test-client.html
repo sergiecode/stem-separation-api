@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stem Separation API - Test Client</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 18px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        input[type="file"],
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="file"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 100%;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .status-card {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .results-card {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .download-link {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin: 5px 10px 5px 0;
+            transition: background 0.3s;
+        }
+        
+        .download-link:hover {
+            background: #218838;
+        }
+        
+        .error-card {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+            color: #721c24;
+        }
+        
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .connection-status {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .connected { background: #28a745; }
+        .disconnected { background: #dc3545; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎵 Stem Separation API</h1>
+            <p>AI-Powered Audio Stem Separation</p>
+            <p style="font-size: 14px;">
+                <span class="connection-status disconnected" id="connectionStatus"></span>
+                <span id="connectionText">Connecting...</span>
+            </p>
+        </div>
+
+        <div class="info-box">
+            <strong>📋 Instructions:</strong>
+            <ul style="margin: 10px 0 0 20px;">
+                <li>Upload an audio file (MP3, WAV, FLAC, etc.)</li>
+                <li>Select your preferred AI model</li>
+                <li>Click "Separate Stems" to start processing</li>
+                <li>Download individual stems when complete</li>
+            </ul>
+        </div>
+
+        <form id="uploadForm" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="audioFile">🎧 Audio File:</label>
+                <input type="file" id="audioFile" accept="audio/*" required>
+            </div>
+
+            <div class="form-group">
+                <label for="model">🤖 AI Model:</label>
+                <select id="model">
+                    <option value="demucs">Demucs - High Quality (Slower)</option>
+                    <option value="openunmix">Open-Unmix - Good Quality (Faster)</option>
+                    <option value="demucs_6s">Demucs 6-Stem - Extended Separation</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="device">⚡ Processing Device:</label>
+                <select id="device">
+                    <option value="auto">Auto (Recommended)</option>
+                    <option value="cpu">CPU Only</option>
+                    <option value="cuda">CUDA GPU (if available)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="format">📁 Output Format:</label>
+                <select id="format">
+                    <option value="wav">WAV (Best Quality)</option>
+                    <option value="flac">FLAC (Lossless Compression)</option>
+                    <option value="mp3">MP3 (Smaller Size)</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn" id="submitBtn">
+                🚀 Separate Stems
+            </button>
+        </form>
+
+        <div class="status-card" id="statusCard">
+            <h3>📊 Processing Status</h3>
+            <p id="statusText">Initializing...</p>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <p id="progressText">0%</p>
+            <p id="timeInfo"></p>
+        </div>
+
+        <div class="results-card" id="resultsCard">
+            <h3>🎉 Separation Complete!</h3>
+            <p>Download your separated stems:</p>
+            <div id="downloadLinks"></div>
+            <p id="processingStats"></p>
+        </div>
+
+        <div class="error-card" id="errorCard">
+            <h3>❌ Error</h3>
+            <p id="errorText"></p>
+        </div>
+
+        <div class="footer">
+            <p>Created with ❤️ by <strong>Sergie Code</strong></p>
+            <p>Learn programming on <a href="https://youtube.com/@sergieCode" target="_blank">YouTube</a></p>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        class StemSeparatorClient {
+            constructor() {
+                this.socket = null;
+                this.currentJobId = null;
+                this.initializeElements();
+                this.connectSocket();
+                this.bindEvents();
+            }
+
+            initializeElements() {
+                this.form = document.getElementById('uploadForm');
+                this.submitBtn = document.getElementById('submitBtn');
+                this.statusCard = document.getElementById('statusCard');
+                this.resultsCard = document.getElementById('resultsCard');
+                this.errorCard = document.getElementById('errorCard');
+                this.statusText = document.getElementById('statusText');
+                this.progressFill = document.getElementById('progressFill');
+                this.progressText = document.getElementById('progressText');
+                this.timeInfo = document.getElementById('timeInfo');
+                this.downloadLinks = document.getElementById('downloadLinks');
+                this.processingStats = document.getElementById('processingStats');
+                this.errorText = document.getElementById('errorText');
+                this.connectionStatus = document.getElementById('connectionStatus');
+                this.connectionText = document.getElementById('connectionText');
+            }
+
+            connectSocket() {
+                this.socket = io();
+
+                this.socket.on('connect', () => {
+                    console.log('📡 Connected to server');
+                    this.updateConnectionStatus(true);
+                });
+
+                this.socket.on('disconnect', () => {
+                    console.log('📡 Disconnected from server');
+                    this.updateConnectionStatus(false);
+                });
+
+                this.socket.on('job-update', (data) => {
+                    this.handleJobUpdate(data);
+                });
+            }
+
+            updateConnectionStatus(connected) {
+                this.connectionStatus.className = `connection-status ${connected ? 'connected' : 'disconnected'}`;
+                this.connectionText.textContent = connected ? 'Connected' : 'Disconnected';
+            }
+
+            bindEvents() {
+                this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+            }
+
+            async handleSubmit(e) {
+                e.preventDefault();
+                this.hideAllCards();
+
+                const formData = new FormData();
+                const audioFile = document.getElementById('audioFile').files[0];
+                
+                if (!audioFile) {
+                    this.showError('Please select an audio file');
+                    return;
+                }
+
+                formData.append('audio', audioFile);
+                formData.append('model', document.getElementById('model').value);
+                formData.append('device', document.getElementById('device').value);
+                formData.append('format', document.getElementById('format').value);
+
+                this.setLoading(true);
+                this.showStatus('Uploading file...', 0);
+
+                try {
+                    const response = await fetch('/api/audio/separate', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        this.currentJobId = result.jobId;
+                        this.socket.emit('subscribe-job', result.jobId);
+                        
+                        this.showStatus('Processing started...', 5);
+                        this.timeInfo.textContent = `Estimated time: ${result.estimatedTime}s`;
+                    } else {
+                        this.showError(result.message || result.error);
+                    }
+                } catch (error) {
+                    this.showError(`Upload failed: ${error.message}`);
+                } finally {
+                    this.setLoading(false);
+                }
+            }
+
+            handleJobUpdate(data) {
+                if (data.jobId !== this.currentJobId) return;
+
+                console.log('📊 Job update:', data);
+
+                if (data.status === 'processing') {
+                    this.showStatus(data.message || 'Processing audio...', data.progress);
+                } else if (data.status === 'completed') {
+                    this.showResults(data.result, data.processingTime);
+                } else if (data.status === 'failed') {
+                    this.showError(data.error || 'Processing failed');
+                }
+            }
+
+            showStatus(message, progress) {
+                this.hideAllCards();
+                this.statusCard.style.display = 'block';
+                this.statusText.textContent = message;
+                this.progressFill.style.width = `${progress}%`;
+                this.progressText.textContent = `${Math.round(progress)}%`;
+            }
+
+            showResults(result, processingTime) {
+                this.hideAllCards();
+                this.resultsCard.style.display = 'block';
+
+                // Clear previous download links
+                this.downloadLinks.innerHTML = '';
+
+                if (result.downloadUrls) {
+                    Object.entries(result.downloadUrls).forEach(([stem, url]) => {
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.className = 'download-link';
+                        link.download = `${stem}.${result.format || 'wav'}`;
+                        link.textContent = `📥 ${stem.charAt(0).toUpperCase() + stem.slice(1)}`;
+                        this.downloadLinks.appendChild(link);
+                    });
+                }
+
+                this.processingStats.innerHTML = `
+                    <strong>📈 Processing Stats:</strong><br>
+                    Model: ${result.model_used || 'N/A'}<br>
+                    Device: ${result.device_used || 'N/A'}<br>
+                    Time: ${processingTime || result.processing_time || 'N/A'}s<br>
+                    Stems: ${result.stems ? result.stems.join(', ') : 'N/A'}
+                `;
+            }
+
+            showError(message) {
+                this.hideAllCards();
+                this.errorCard.style.display = 'block';
+                this.errorText.textContent = message;
+            }
+
+            hideAllCards() {
+                this.statusCard.style.display = 'none';
+                this.resultsCard.style.display = 'none';
+                this.errorCard.style.display = 'none';
+            }
+
+            setLoading(loading) {
+                this.submitBtn.disabled = loading;
+                this.submitBtn.textContent = loading ? '⏳ Processing...' : '🚀 Separate Stems';
+            }
+        }
+
+        // Initialize the client when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new StemSeparatorClient();
+        });
+    </script>
+</body>
+</html>

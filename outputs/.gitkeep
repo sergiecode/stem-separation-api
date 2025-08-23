@@ -1,0 +1,3 @@
+# Keep this file to ensure the outputs directory is tracked in git
+# Separated audio stems will be stored here temporarily
+# Files are automatically cleaned up after 24 hours
