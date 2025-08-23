@@ -11,7 +11,7 @@ const router = express.Router();
  * @desc    Get available AI models for stem separation
  * @access  Public
  */
-router.get('/models', audioController.getModels);
+router.get('/models', audioController.getModels.bind(audioController));
 
 /**
  * @route   POST /api/audio/separate
@@ -23,7 +23,7 @@ router.post('/separate',
     upload.single('audio'),
     validation.validateAudioFile,
     validation.validateProcessingOptions,
-    audioController.separateStems
+    audioController.separateStems.bind(audioController)
 );
 
 /**
@@ -33,7 +33,7 @@ router.post('/separate',
  */
 router.get('/status/:jobId', 
     validation.validateJobId,
-    audioController.getStatus
+    audioController.getStatus.bind(audioController)
 );
 
 /**
@@ -44,7 +44,7 @@ router.get('/status/:jobId',
 router.get('/download/:jobId/:stem', 
     validation.validateJobId,
     validation.validateStemName,
-    audioController.downloadStem
+    audioController.downloadStem.bind(audioController)
 );
 
 /**
@@ -54,7 +54,7 @@ router.get('/download/:jobId/:stem',
  */
 router.delete('/job/:jobId',
     validation.validateJobId,
-    audioController.cancelJob
+    audioController.cancelJob.bind(audioController)
 );
 
 /**
@@ -62,6 +62,6 @@ router.delete('/job/:jobId',
  * @desc    Get list of recent jobs (last 100)
  * @access  Public (consider adding auth for production)
  */
-router.get('/jobs', audioController.getRecentJobs);
+router.get('/jobs', audioController.getRecentJobs.bind(audioController));
 
 module.exports = router;

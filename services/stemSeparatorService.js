@@ -60,8 +60,7 @@ class StemSeparatorService {
             '--input', `"${inputFile}"`,
             '--output', `"${outputDir}"`,
             '--model', model,
-            '--device', device,
-            '--format', format
+            '--device', device
         ];
 
         if (!verbose) {
