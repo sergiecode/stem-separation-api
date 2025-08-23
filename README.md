@@ -734,8 +734,8 @@ I'm a passionate software engineer and programming educator who creates AI tools
 
 Check out my other AI tools for musicians:
 - [Audio Stem Separator](https://github.com/sergieCode/audio-stem-separator) - Python backend
-- [Music AI Toolkit](https://github.com/sergieCode/music-ai-toolkit) - Complete AI music tools
-- [Beat Detection API](https://github.com/sergieCode/beat-detection-api) - Rhythm analysis
+- [Audio Engancer Service](https://github.com/sergiecode/audio-enhancer-service) - Python backend
+
 
 ## 🌟 Support the Project
 
