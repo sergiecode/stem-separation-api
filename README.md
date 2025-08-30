@@ -971,10 +971,6 @@ npm install
 npm run dev
 ```
 
-## 📄 License
-
-MIT License - Feel free to use this in your projects, both personal and commercial.
-
 ## 👨‍💻 About Sergie Code
 
 I'm a passionate software engineer and programming educator who creates AI tools for musicians and developers. 
@@ -1017,3 +1013,4 @@ If this API helps your music production workflow:
 **Made with ❤️ for the music community by Sergie Code**
 
 *Empowering musicians with AI technology, one API at a time.*
+
